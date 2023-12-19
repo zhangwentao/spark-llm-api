@@ -8,6 +8,6 @@
     "declarationMap": true
   },
   "include": [
-    "src/*"
+    "src/index.ts"
   ]
 }
