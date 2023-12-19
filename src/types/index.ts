@@ -1,15 +1,15 @@
-interface SparkMessage {
+interface Message {
   role: 'user' | 'assistant'
   content: string
 }
-interface SparkRequestBody {
+interface RequestBody {
   header: {
     app_id: string
     uid?: string
   },
   parameter: {
     chat: {
-      domain: 'general'|'generalv2'|'generalv3'
+      domain: 'general' | 'generalv2' | 'generalv3'
       temperature?: number
       max_tokens?: number
       top_k?: number
@@ -18,12 +18,12 @@ interface SparkRequestBody {
   },
   payload: {
     message: {
-      text: Array<SparkMessage>
+      text: Array<Message>
     }
   }
 }
 
 export type {
-  SparkMessage,
-  SparkRequestBody
+  Message,
+  RequestBody
 }
