@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npx tsc -p tsconfig-dev.json --watch",
     "start": "node authorization.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^20.10.5",
+    "@types/ws": "^8.5.10",
     "ws": "^8.15.1"
   },
   "devDependencies": {
