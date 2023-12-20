@@ -1,12 +1,20 @@
 import { EventEmitter } from 'events'
 import { WebSocket } from 'ws'
-import { Message, RequestBody, Domain, DomainEnum, Constants } from './types'
+import {
+  Message,
+  RequestBody,
+  Domain,
+  DomainEnum,
+  Constants,
+  Status,
+  StatusEnum
+} from './types'
 import { getAuthorizedURL } from './authorization'
 
 class Client extends EventEmitter {
   private url: string
   private ws: WebSocket
-  private ok: boolean
+  private status: Status
   private appId: string
   private version: string
   constructor(params: {
@@ -29,6 +37,7 @@ class Client extends EventEmitter {
 
     this.appId = appId
     this.version = version
+    this.status = StatusEnum.INACTIVE
 
     this.url = getAuthorizedURL({
       apiKey,
@@ -37,10 +46,12 @@ class Client extends EventEmitter {
       protocal,
       host
     })
-    this.initWebSocket()
   }
 
-  private initWebSocket () {
+  private initWebSocket (params: {
+    onOpen: () => any
+  }) {
+    const {onOpen} = params
     const ws = new WebSocket(this.url)
     ws.on('error', (err) => {
       console.log(err)
@@ -48,7 +59,8 @@ class Client extends EventEmitter {
 
     ws.on('open', () => {
       console.info('websocket established')
-      this.ok = true
+      this.status = StatusEnum.ACTIVE
+      onOpen && onOpen()
     });
 
     ws.on('message', (data) => {
@@ -142,7 +154,15 @@ class Client extends EventEmitter {
       chatId,
       uid
     })
-    this.ws.send(JSON.stringify(requestBody))
+    if (this.status === StatusEnum.INACTIVE) {
+      this.initWebSocket({
+        onOpen: ():void => {
+          this.ws.send(JSON.stringify(requestBody))
+        }
+      })
+    } else if (this.status === StatusEnum.ACTIVE) {
+      this.ws.send(JSON.stringify(requestBody))
+    }
   }
 }
 

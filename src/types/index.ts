@@ -5,6 +5,13 @@ enum Constants {
   DEFAULT_HOST = 'spark-api.xf-yun.com'
 }
 
+enum StatusEnum {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive'
+}
+
+type Status = StatusEnum.ACTIVE | StatusEnum.INACTIVE
+
 enum RoleEnum {
   USER = 'user',
   ASSISTANT = 'assistant'
@@ -50,11 +57,13 @@ export type {
   Message,
   Role,
   Domain,
-  RequestBody
+  RequestBody,
+  Status
 }
 
 export {
   Constants,
   RoleEnum,
-  DomainEnum
+  DomainEnum,
+  StatusEnum
 }
