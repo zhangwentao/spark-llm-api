@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "npx tsc -p tsconfig-dev.json --watch",
     "release": "npx tsc -p tsconfig-release.json",
-    "demo": "node demo/main.js"
+    "demo:authorization": "node -r dotenv/config demo/authorization.js",
+    "demo:client": "node -r dotenv/config demo/client.js"
   },
   "keywords": [],
   "author": "zhangwentao <taowenzhang@gmail.com> (https://wentao.me)",
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@types/node": "^20.10.5",
     "@types/ws": "^8.5.10",
+    "dotenv": "^16.3.1",
     "typescript": "^5.3.3"
   }
 }
