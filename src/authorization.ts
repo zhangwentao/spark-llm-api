@@ -1,18 +1,19 @@
 import { createHmac } from 'crypto'
 import { format } from 'url'
+import { Constants } from './types'
 const getAuthorizedURL = (params: {
-  APISecret: string
-  APIKey: string
+  apiSecret: string
+  apiKey: string
   version?: string
   protocal?: string
   host?: string
 }) => {
   const {
-    APISecret,
-    APIKey,
-    version = 'v3.1',
-    protocal = 'ws',
-    host = 'spark-api.xf-yun.com'
+    apiSecret,
+    apiKey,
+    version = Constants.DEFAULT_VERSION,
+    protocal = Constants.DEFAULT_PROTOCAL,
+    host = Constants.DEFAULT_HOST
   } = params
 
   const dateStr = (new Date).toUTCString()
@@ -22,11 +23,11 @@ const getAuthorizedURL = (params: {
   + `date: ${dateStr}\n`
   + `GET /${version}/chat HTTP/1.1`
 
-  const signature = createHmac('sha256', APISecret)
+  const signature = createHmac('sha256', apiSecret)
     .update(tmp)
     .digest('base64')
 
-  const authorization_origin = `api_key="${APIKey}", algorithm="hmac-sha256", headers="host date request-line", signature="${signature}"`
+  const authorization_origin = `api_key="${apiKey}", algorithm="hmac-sha256", headers="host date request-line", signature="${signature}"`
 
   const authorization = Buffer
     .from(authorization_origin, 'utf-8')
