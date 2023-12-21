@@ -1,7 +1,7 @@
 {
   "name": "spark-llm-api",
   "version": "0.1.2",
-  "description": "讯飞星火大模型api调用库",
+  "description": "讯飞星火大模型API Node.js SDK",
   "main": "lib/index.js",
   "scripts": {
     "dev": "npx tsc -p tsconfig-dev.json --watch",
@@ -14,7 +14,12 @@
     "LLM",
     "chatGPT",
     "讯飞星火",
-    "LLM-api"
+    "讯飞星火V1.5",
+    "讯飞星火V2.0",
+    "讯飞星火V3.0",
+    "LLM-api",
+    "人工智能",
+    "大模型"
   ],
   "author": "zhangwentao <taowenzhang@gmail.com> (https://wentao.me)",
   "repository": {
