@@ -1,6 +1,6 @@
 {
   "name": "spark-llm-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "讯飞星火大模型api调用库",
   "main": "lib/index.js",
   "scripts": {
@@ -9,7 +9,13 @@
     "demo:authorization": "node -r dotenv/config demo/authorization.js",
     "demo:client": "node -r dotenv/config demo/client.js"
   },
-  "keywords": ["AI", "LLM", "chatGPT", "讯飞星火", "LLM-api"],
+  "keywords": [
+    "AI",
+    "LLM",
+    "chatGPT",
+    "讯飞星火",
+    "LLM-api"
+  ],
   "author": "zhangwentao <taowenzhang@gmail.com> (https://wentao.me)",
   "license": "ISC",
   "dependencies": {
