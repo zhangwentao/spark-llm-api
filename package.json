@@ -17,6 +17,11 @@
     "LLM-api"
   ],
   "author": "zhangwentao <taowenzhang@gmail.com> (https://wentao.me)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhangwentao/spark-llm-api.git"
+  },
+  "homepage": "https://github.com/zhangwentao/spark-llm-api#readme",
   "license": "ISC",
   "dependencies": {
     "ws": "^8.15.1"
