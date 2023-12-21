@@ -67,11 +67,11 @@ class Client extends EventEmitter {
       console.log(err)
     });
     ws.on('close', (code, reason) => {
-      console.error('closed')
-      console.log(code, reason.toString('utf-8'))
+      // console.error('closed')
+      // console.log(code, reason.toString('utf-8'))
     })
     ws.on('open', () => {
-      console.info('websocket established')
+      // console.info('websocket established')
       this.status = StatusEnum.CONNECTED
       onOpen && onOpen()
     });
