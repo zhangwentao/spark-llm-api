@@ -1,8 +1,12 @@
 const {getAuthorizedURL} = require('../lib')
+const {
+  APIKey,
+  APISecret,
+} = process.env
 
 const url = getAuthorizedURL({
-  APIKey: '',
-  APISecret: ''
+  apiKey: APIKey,
+  apiSecret: APISecret
 })
 
 const { WebSocket } = require('ws')

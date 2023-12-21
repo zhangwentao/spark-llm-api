@@ -1,6 +1,6 @@
 declare const getAuthorizedURL: (params: {
-    APISecret: string;
-    APIKey: string;
+    apiSecret: string;
+    apiKey: string;
     version?: string;
     protocal?: string;
     host?: string;
