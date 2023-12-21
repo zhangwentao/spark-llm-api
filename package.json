@@ -1,6 +1,6 @@
 {
   "name": "spark-llm-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "讯飞星火大模型api调用库",
   "main": "lib/index.js",
   "scripts": {
