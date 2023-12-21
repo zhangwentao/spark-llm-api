@@ -1,16 +1,17 @@
 
 enum Constants {
   DEFAULT_VERSION = 'v3.1',
-  DEFAULT_PROTOCAL = 'ws',
+  DEFAULT_PROTOCAL = 'wss',
   DEFAULT_HOST = 'spark-api.xf-yun.com'
 }
 
 enum StatusEnum {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive'
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected',
+  PENDING = 'pending'
 }
 
-type Status = StatusEnum.ACTIVE | StatusEnum.INACTIVE
+type Status = StatusEnum.CONNECTED | StatusEnum.DISCONNECTED | StatusEnum.PENDING
 
 enum RoleEnum {
   USER = 'user',
@@ -53,17 +54,58 @@ interface RequestBody {
   }
 }
 
+enum ResponseMessageStatusEnum {
+  FIRST_SEGMENT = 0,
+  MIDDLE_SEGMENT = 1,
+  LAST_SEGMENT = 2
+}
+
+type ResponseMessageStatus
+  = ResponseMessageStatusEnum.FIRST_SEGMENT
+  | ResponseMessageStatusEnum.MIDDLE_SEGMENT
+  | ResponseMessageStatusEnum.LAST_SEGMENT
+
+interface Usage {
+  question_tokens: number,
+  prompt_tokens: number,
+  completion_tokens: number,
+  total_tokens: number
+}
+
+interface ResponseBody {
+  header:{
+      code: number,
+      message: string,
+      sid: string,
+      status: ResponseMessageStatus
+  },
+  payload:{
+      choices: {
+          status: ResponseMessageStatus,
+          seq: number,
+          text: Array<Message>
+      },
+      usage?: {
+          text: Usage
+      }
+  }
+}
+
 export type {
   Message,
   Role,
   Domain,
   RequestBody,
-  Status
+  Status,
+  Usage,
+  ResponseMessageStatus,
+  ResponseBody
 }
 
 export {
   Constants,
   RoleEnum,
   DomainEnum,
-  StatusEnum
+  StatusEnum,
+  ResponseMessageStatusEnum
 }

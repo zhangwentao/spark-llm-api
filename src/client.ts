@@ -7,9 +7,13 @@ import {
   DomainEnum,
   Constants,
   Status,
-  StatusEnum
+  StatusEnum,
+  ResponseBody,
+  ResponseMessageStatus,
+  ResponseMessageStatusEnum
 } from './types'
 import { getAuthorizedURL } from './authorization'
+import { rejects } from 'assert'
 
 class Client extends EventEmitter {
   private url: string
@@ -17,6 +21,8 @@ class Client extends EventEmitter {
   private status: Status
   private appId: string
   private version: string
+  private cache: ResponseBody
+  private emitter: EventEmitter
   constructor(params: {
     apiKey: string
     apiSecret: string
@@ -37,7 +43,8 @@ class Client extends EventEmitter {
 
     this.appId = appId
     this.version = version
-    this.status = StatusEnum.INACTIVE
+    this.status = StatusEnum.DISCONNECTED
+    this.emitter = new EventEmitter()
 
     this.url = getAuthorizedURL({
       apiKey,
@@ -51,21 +58,29 @@ class Client extends EventEmitter {
   private initWebSocket (params: {
     onOpen: () => any
   }) {
+    if (this.ws) {
+      this.ws.removeAllListeners()
+    }
     const {onOpen} = params
     const ws = new WebSocket(this.url)
     ws.on('error', (err) => {
       console.log(err)
     });
-
+    ws.on('close', (code, reason) => {
+      console.error('closed')
+      console.log(code, reason.toString('utf-8'))
+    })
     ws.on('open', () => {
       console.info('websocket established')
-      this.status = StatusEnum.ACTIVE
+      this.status = StatusEnum.CONNECTED
       onOpen && onOpen()
     });
 
     ws.on('message', (data) => {
-      console.log('received: %s', data);
-    });
+      const dataStr = data.toString('utf-8')
+      const dataObj = JSON.parse(dataStr)
+      this.handleWSMessage({ responseBody: dataObj})
+    })
 
     this.ws = ws
   }
@@ -130,14 +145,48 @@ class Client extends EventEmitter {
     return requestBody
   }
 
-  public chat(params: {
+  private send(params: {
+    requestBody: RequestBody
+  }) {
+    const { requestBody } = params
+    const requestBodyStr = JSON.stringify(requestBody)
+    this.status = StatusEnum.PENDING
+    this.ws.send(requestBodyStr)
+
+  }
+
+  private handleWSMessage(params: {
+    responseBody: ResponseBody
+  }) {
+    const { responseBody } = params
+    const { header: { status }} = responseBody
+    if (status === ResponseMessageStatusEnum.FIRST_SEGMENT) {
+      this.cache = responseBody
+    } else if (
+        status === ResponseMessageStatusEnum.MIDDLE_SEGMENT
+        || status === ResponseMessageStatusEnum.LAST_SEGMENT
+      ) {
+      const textObj = this.cache.payload.choices?.text[0]
+      const preContent = textObj.content
+      const curContent = preContent + responseBody.payload.choices.text?.[0].content
+      textObj.content = curContent
+    }
+    if (status === ResponseMessageStatusEnum.LAST_SEGMENT) {
+      const usage = responseBody.payload.usage
+      this.cache.payload.usage = usage
+      this.status = StatusEnum.DISCONNECTED
+      this.emitter.emit('finish')
+    }
+  }
+
+  public async chat(params: {
     messages: Array<Message>
     temperature?: number
     topK?: number
     maxTokens?: number
     chatId?: string
     uid?: string
-  }) {
+  }): Promise<ResponseBody> {
     const {
       messages,
       temperature,
@@ -154,15 +203,24 @@ class Client extends EventEmitter {
       chatId,
       uid
     })
-    if (this.status === StatusEnum.INACTIVE) {
-      this.initWebSocket({
-        onOpen: ():void => {
-          this.ws.send(JSON.stringify(requestBody))
-        }
+    const promise = new Promise<ResponseBody>((resolve, reject) => {
+      if (this.status === StatusEnum.PENDING) {
+        reject('wating last chat reply...')
+      }
+      if (this.status === StatusEnum.DISCONNECTED) {
+        this.initWebSocket({
+          onOpen:() => {
+            this.send({requestBody})
+          }
+        })
+      } else if (this.status === StatusEnum.CONNECTED) {
+          this.send({requestBody})
+      }
+      this.emitter.once('finish', () => {
+        resolve(this.cache)
       })
-    } else if (this.status === StatusEnum.ACTIVE) {
-      this.ws.send(JSON.stringify(requestBody))
-    }
+    })
+    return promise
   }
 }
 
