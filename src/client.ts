@@ -4,31 +4,35 @@ import {
   Message,
   RequestBody,
   Domain,
-  DomainEnum,
-  Constants,
+  APIProtocol,
   Status,
   StatusEnum,
   ResponseBody,
-  ResponseMessageStatus,
+  ModelVersion,
   ResponseMessageStatusEnum
 } from './types'
+import {
+  DEFAULT_API_HOST,
+  DEFAULT_API_PROTOCOL,
+  DEFAULT_MODEL_VERSION,
+  MODEL_VERSION_TO_DOMAIN
+} from './constants'
 import { getAuthorizedURL } from './authorization'
-import { rejects } from 'assert'
 
 class Client extends EventEmitter {
   private url: string
   private ws: WebSocket
   private status: Status
   private appId: string
-  private version: string
+  private version: ModelVersion
   private cache: ResponseBody
   private emitter: EventEmitter
   constructor(params: {
     apiKey: string
     apiSecret: string
     appId: string
-    version?: string
-    protocal?: string
+    version?: ModelVersion
+    protocal?: APIProtocol
     host?: string
   }) {
     super()
@@ -36,9 +40,9 @@ class Client extends EventEmitter {
       apiKey,
       apiSecret,
       appId,
-      version = Constants.DEFAULT_VERSION,
-      protocal = Constants.DEFAULT_PROTOCAL,
-      host = Constants.DEFAULT_HOST
+      version = DEFAULT_MODEL_VERSION,
+      protocal = DEFAULT_API_PROTOCOL,
+      host = DEFAULT_API_HOST
     } = params
 
     this.appId = appId
@@ -89,20 +93,7 @@ class Client extends EventEmitter {
     version: string
   }): Domain {
     const {version} = params
-    const mainVersion = version.match(/v(\d)\.\d*/)?.[1]
-    let domain
-    switch (mainVersion) {
-      case '1':
-        domain = DomainEnum.GENERAL
-        break
-      case '2':
-        domain = DomainEnum.GENERAL_V2
-        break
-      case '3':
-        domain = DomainEnum.GENERAL_V3
-        break
-    }
-    return domain
+    return MODEL_VERSION_TO_DOMAIN[version]
   }
 
   private genRequestBody(params: {

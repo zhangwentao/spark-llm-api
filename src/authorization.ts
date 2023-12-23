@@ -1,6 +1,11 @@
 import { createHmac } from 'crypto'
 import { format } from 'url'
-import { Constants } from './types'
+import {
+  DEFAULT_MODEL_VERSION,
+  DEFAULT_API_HOST,
+  DEFAULT_API_PROTOCOL,
+  MODEL_VERSION_STR_IN_API
+} from './constants'
 const getAuthorizedURL = (params: {
   apiSecret: string
   apiKey: string
@@ -11,17 +16,19 @@ const getAuthorizedURL = (params: {
   const {
     apiSecret,
     apiKey,
-    version = Constants.DEFAULT_VERSION,
-    protocal = Constants.DEFAULT_PROTOCAL,
-    host = Constants.DEFAULT_HOST
+    version = DEFAULT_MODEL_VERSION,
+    protocal = DEFAULT_API_PROTOCOL,
+    host = DEFAULT_API_HOST
   } = params
 
   const dateStr = (new Date).toUTCString()
 
+  const versionStr = MODEL_VERSION_STR_IN_API[version]
+
   const tmp = ''
   + `host: ${host}\n`
   + `date: ${dateStr}\n`
-  + `GET /${version}/chat HTTP/1.1`
+  + `GET /${versionStr}/chat HTTP/1.1`
 
   const signature = createHmac('sha256', apiSecret)
     .update(tmp)
@@ -39,7 +46,7 @@ const getAuthorizedURL = (params: {
     host,
   };
 
-  const url = `${protocal}://${host}/${version}/chat${format({ query })}`
+  const url = `${protocal}://${host}/${versionStr}/chat${format({ query })}`
 
   return url
 }

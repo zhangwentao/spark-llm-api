@@ -1,8 +1,14 @@
-declare enum Constants {
-    DEFAULT_VERSION = "v3.1",
-    DEFAULT_PROTOCAL = "wss",
-    DEFAULT_HOST = "spark-api.xf-yun.com"
+declare enum ModelVersionEnum {
+    V1_5 = "v1.5",
+    V2_0 = "v2.0",
+    V3_0 = "v3.0"
 }
+type ModelVersion = ModelVersionEnum.V1_5 | ModelVersionEnum.V2_0 | ModelVersionEnum.V3_0;
+declare enum APIProtocolEnum {
+    WSS = "wss",
+    WS = "ws"
+}
+type APIProtocol = APIProtocolEnum.WS | APIProtocolEnum.WSS;
 declare enum StatusEnum {
     CONNECTED = "connected",
     DISCONNECTED = "disconnected",
@@ -74,6 +80,6 @@ interface ResponseBody {
         };
     };
 }
-export type { Message, Role, Domain, RequestBody, Status, Usage, ResponseMessageStatus, ResponseBody };
-export { Constants, RoleEnum, DomainEnum, StatusEnum, ResponseMessageStatusEnum };
+export type { Message, Role, Domain, RequestBody, Status, Usage, ResponseMessageStatus, ResponseBody, ModelVersion, APIProtocol };
+export { RoleEnum, DomainEnum, StatusEnum, ResponseMessageStatusEnum, ModelVersionEnum, APIProtocolEnum };
 //# sourceMappingURL=index.d.ts.map
