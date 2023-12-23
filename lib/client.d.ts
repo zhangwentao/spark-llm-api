@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import { Message, ResponseBody } from './types';
+import { Message, APIProtocol, ResponseBody, ModelVersion } from './types';
 declare class Client extends EventEmitter {
     private url;
     private ws;
@@ -13,8 +13,8 @@ declare class Client extends EventEmitter {
         apiKey: string;
         apiSecret: string;
         appId: string;
-        version?: string;
-        protocal?: string;
+        version?: ModelVersion;
+        protocal?: APIProtocol;
         host?: string;
     });
     private initWebSocket;
