@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
 import { Message, APIProtocol, ResponseBody, ModelVersion } from './types';
+import { ResponseStream } from './reponse-stream';
 declare class Client extends EventEmitter {
     private url;
     private ws;
@@ -9,6 +10,8 @@ declare class Client extends EventEmitter {
     private version;
     private cache;
     private emitter;
+    private streamMode;
+    private responseStream;
     constructor(params: {
         apiKey: string;
         apiSecret: string;
@@ -16,6 +19,7 @@ declare class Client extends EventEmitter {
         version?: ModelVersion;
         protocal?: APIProtocol;
         host?: string;
+        streamMode?: boolean;
     });
     private initWebSocket;
     private resolveDomain;
@@ -29,7 +33,7 @@ declare class Client extends EventEmitter {
         maxTokens?: number;
         chatId?: string;
         uid?: string;
-    }): Promise<ResponseBody>;
+    }): Promise<ResponseBody | ResponseStream>;
 }
 export { Client };
 //# sourceMappingURL=client.d.ts.map

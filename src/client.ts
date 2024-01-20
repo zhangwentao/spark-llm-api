@@ -18,6 +18,7 @@ import {
   MODEL_VERSION_TO_DOMAIN
 } from './constants'
 import { getAuthorizedURL } from './authorization'
+import { ResponseStream } from './reponse-stream'
 
 class Client extends EventEmitter {
   private url: string
@@ -27,6 +28,8 @@ class Client extends EventEmitter {
   private version: ModelVersion
   private cache: ResponseBody
   private emitter: EventEmitter
+  private streamMode: boolean
+  private responseStream: ResponseStream
   constructor(params: {
     apiKey: string
     apiSecret: string
@@ -34,6 +37,7 @@ class Client extends EventEmitter {
     version?: ModelVersion
     protocal?: APIProtocol
     host?: string
+    streamMode?: boolean
   }) {
     super()
     const {
@@ -42,12 +46,14 @@ class Client extends EventEmitter {
       appId,
       version = DEFAULT_MODEL_VERSION,
       protocal = DEFAULT_API_PROTOCOL,
-      host = DEFAULT_API_HOST
+      host = DEFAULT_API_HOST,
+      streamMode = false
     } = params
 
     this.appId = appId
     this.version = version
     this.status = StatusEnum.DISCONNECTED
+    this.streamMode = streamMode
     this.emitter = new EventEmitter()
 
     this.url = getAuthorizedURL({
@@ -83,7 +89,11 @@ class Client extends EventEmitter {
     ws.on('message', (data) => {
       const dataStr = data.toString('utf-8')
       const dataObj = JSON.parse(dataStr)
-      this.handleWSMessage({ responseBody: dataObj})
+      if (this.streamMode) {
+        this.responseStream.write(dataObj)
+      } else {
+        this.handleWSMessage({ responseBody: dataObj})
+      }
     })
 
     this.ws = ws
@@ -177,7 +187,7 @@ class Client extends EventEmitter {
     maxTokens?: number
     chatId?: string
     uid?: string
-  }): Promise<ResponseBody> {
+  }): Promise<ResponseBody| ResponseStream> {
     const {
       messages,
       temperature,
@@ -194,7 +204,10 @@ class Client extends EventEmitter {
       chatId,
       uid
     })
-    const promise = new Promise<ResponseBody>((resolve, reject) => {
+    const promise = new Promise<ResponseBody | ResponseStream>((resolve, reject) => {
+      if (this.streamMode) {
+        this.responseStream = new ResponseStream()
+      }
       if (this.status === StatusEnum.PENDING) {
         reject('wating last chat reply...')
       }
@@ -207,9 +220,13 @@ class Client extends EventEmitter {
       } else if (this.status === StatusEnum.CONNECTED) {
           this.send({requestBody})
       }
-      this.emitter.once('finish', () => {
-        resolve(this.cache)
-      })
+      if (this.streamMode) {
+        resolve(this.responseStream)
+      } else {
+        this.emitter.once('finish', () => {
+          resolve(this.cache)
+        })
+      }
     })
     return promise
   }
