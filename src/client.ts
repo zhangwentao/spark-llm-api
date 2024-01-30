@@ -70,6 +70,7 @@ class Client extends EventEmitter {
   }) {
     if (this.ws) {
       this.ws.removeAllListeners()
+      this.ws.terminate()
     }
     const {onOpen} = params
     const ws = new WebSocket(this.url)
