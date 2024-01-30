@@ -8,7 +8,8 @@
     "release": "npx tsc -p tsconfig-release.json",
     "demo:authorization": "node -r dotenv/config demo/authorization.js",
     "demo:client": "node -r dotenv/config demo/client.js",
-    "demo:client-stream-mode": "node -r dotenv/config demo/client-stream-mode.js"
+    "demo:client-stream-mode": "node -r dotenv/config demo/client-stream-mode.js",
+    "demo:debug": "node -r dotenv/config demo/debug"
   },
   "keywords": [
     "AI",
