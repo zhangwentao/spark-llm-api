@@ -20,7 +20,8 @@ class SimpleWriable extends Writable {
     })
   }
   _write(trunk, encoding, callback) {
-    const content = trunk.payload.choices.text?.[0].content
+    // const content = trunk.payload.choices.text?.[0].content
+    const content = `${JSON.stringify(trunk)}\n`
     process.stdout.write(content, () => {
       callback()
     })
