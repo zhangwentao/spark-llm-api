@@ -14,16 +14,27 @@ const client = new Client({
 
 
 const main = async() => {
+  // const result = await client.chat({
+  //   maxTokens: 8193,
+  //   messages:[
+  //     {
+  //       role: 'user',
+  //       content: prompt
+  //     }
+  //   ]
+  // })
+
   const result = await client.chat({
     maxTokens: 8192,
     messages:[
       {
         role: 'user',
-        content: prompt
+        content: 'hello'
       }
     ]
   })
   console.log(result.payload.choices.text?.[0].content)
+  console.log(result)
 }
 
 main()
