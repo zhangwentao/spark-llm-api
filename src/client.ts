@@ -75,14 +75,14 @@ class Client extends EventEmitter {
     const {onOpen} = params
     const ws = new WebSocket(this.url)
     ws.on('error', (err) => {
-      console.log(err)
+      console.error(err)
+      throw err
     });
     ws.on('close', (code, reason) => {
-      // console.error('closed')
-      // console.log(code, reason.toString('utf-8'))
+      console.info(code, reason.toString('utf-8'))
     })
     ws.on('open', () => {
-      // console.info('websocket established')
+      console.info('websocket established')
       this.status = StatusEnum.CONNECTED
       onOpen && onOpen()
     });
@@ -154,14 +154,18 @@ class Client extends EventEmitter {
     const requestBodyStr = JSON.stringify(requestBody)
     this.status = StatusEnum.PENDING
     this.ws.send(requestBodyStr)
-
   }
 
   private handleWSMessage(params: {
     responseBody: ResponseBody
   }) {
     const { responseBody } = params
-    const { header: { status }} = responseBody
+    const { header: { status, code }} = responseBody
+    if (code !== 0) {
+      this.cache = responseBody
+      this.emitter.emit('finish')
+      return
+    }
     if (status === ResponseMessageStatusEnum.FIRST_SEGMENT) {
       this.cache = responseBody
     } else if (
@@ -176,6 +180,7 @@ class Client extends EventEmitter {
     if (status === ResponseMessageStatusEnum.LAST_SEGMENT) {
       const usage = responseBody.payload.usage
       this.cache.payload.usage = usage
+      this.cache.header = responseBody.header
       this.status = StatusEnum.DISCONNECTED
       this.emitter.emit('finish')
     }
